@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Emploi du temps IUT Limoges</string>
     <string name="edt">EDT</string>
+    <string-array name="year_array">
+        <item>A1</item>
+        <item>A2</item>
+        <item>A3</item>
+    </string-array>
 </resources>

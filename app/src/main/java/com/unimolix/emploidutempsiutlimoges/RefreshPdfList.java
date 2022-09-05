@@ -35,9 +35,11 @@ public class RefreshPdfList extends AsyncTask<Activity, Integer, Integer> {
     private final Runnable onEnd;
     private final int pixelHeight;
     private final int pixelWidth;
+    private final int targetYear;
 
 
-    public RefreshPdfList(File filesDir, File cacheDir, int pixelHeight, int pixelWidth, Runnable onEnd) {
+    public RefreshPdfList(int targetYear, File filesDir, File cacheDir, int pixelHeight, int pixelWidth, Runnable onEnd) {
+        this.targetYear = targetYear;
         this.filesDir = filesDir;
         this.cacheDir = cacheDir;
         this.pixelHeight = pixelHeight;
@@ -51,24 +53,24 @@ public class RefreshPdfList extends AsyncTask<Activity, Integer, Integer> {
             List<File> pdfList = new ArrayList<>();
 
 
-        String name;
-        int i = 1;
-        name = "A2_S" + i + ".pdf";
+            String name;
+            int i = 1;
+            name = "A" + (targetYear + 1) + "_S" + i + ".pdf";
 
 
-        while (DownloadPdf("http://edt-iut-info.unilim.fr/edt/A2/" + name, name)) {
-            pdfList.add(new File(filesDir + "/" + name));
-            i++;
-            name = "A2_S" + i + ".pdf";
-        }
+            while (DownloadPdf("http://edt-iut-info.unilim.fr/edt/A" + (targetYear + 1) + "/" + name, name)) {
+                pdfList.add(new File(filesDir + "/" + name));
+                i++;
+                name = "A" + (targetYear + 1) + "_S" + i + ".pdf";
+            }
 
-        downloadImages(pdfList, contexts[0].getContentResolver());
+            downloadImages(pdfList, contexts[0].getContentResolver());
 
-        if (i == 1) {
-            contexts[0].runOnUiThread(() -> Toast.makeText(contexts[0], "No edt found. Check connection", Toast.LENGTH_SHORT).show());
-        }
-        return i - 1;
-        }catch (Exception e){
+            if (i == 1) {
+                contexts[0].runOnUiThread(() -> Toast.makeText(contexts[0], "No edt found. Check connection", Toast.LENGTH_SHORT).show());
+            }
+            return i - 1;
+        } catch (Exception e) {
             Log.e("RefreshPdfList", e.getMessage());
             return 0;
         }
