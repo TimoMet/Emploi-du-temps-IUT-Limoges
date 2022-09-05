@@ -1,6 +1,8 @@
 package com.unimolix.emploidutempsiutlimoges;
 
+import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
@@ -9,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.FileUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
@@ -25,7 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RefreshPdfList extends AsyncTask<ContentResolver, Integer, Integer> {
+public class RefreshPdfList extends AsyncTask<Activity, Integer, Integer> {
 
     private final File filesDir;
     private final File cacheDir;
@@ -43,7 +46,7 @@ public class RefreshPdfList extends AsyncTask<ContentResolver, Integer, Integer>
     }
 
     @Override
-    protected Integer doInBackground(ContentResolver... contentResolvers) {
+    protected Integer doInBackground(Activity... contexts) {
         try {
             List<File> pdfList = new ArrayList<>();
 
@@ -59,7 +62,11 @@ public class RefreshPdfList extends AsyncTask<ContentResolver, Integer, Integer>
             name = "A2_S" + i + ".pdf";
         }
 
-        downloadImages(pdfList, contentResolvers[0]);
+        downloadImages(pdfList, contexts[0].getContentResolver());
+
+        if (i == 1) {
+            contexts[0].runOnUiThread(() -> Toast.makeText(contexts[0], "No edt found. Check connection", Toast.LENGTH_SHORT).show());
+        }
         return i - 1;
         }catch (Exception e){
             Log.e("RefreshPdfList", e.getMessage());
