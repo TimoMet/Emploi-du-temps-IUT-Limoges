@@ -1,7 +1,6 @@
 package com.unimolix.emploidutempsiutlimoges;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -11,12 +10,17 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Constraints;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+import androidx.work.Worker;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jsibbold.zoomage.ZoomageView;
@@ -27,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,10 +88,27 @@ public class MainActivity extends AppCompatActivity {
 
         checkFirstConnection();
 
+        yearTarget = getSharedPreferences("settings", MODE_PRIVATE).getInt("year", 0);
+
+        Notifications.createNotificationChannels(this);
+
+        checkInBackground();
 
         refreshBitmapList();
         refreshImage();
         refresh();
+    }
+
+
+    private void checkInBackground() {
+        WorkRequest workRequest = new OneTimeWorkRequest.Builder(CheckForNewEdt.class)
+                .build();
+        WorkManager.getInstance(this).enqueue(workRequest);
+
+        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForNewEdt.class, 20, TimeUnit.MINUTES)
+                .build();
+
+        WorkManager.getInstance(this).enqueue(periodicWorkRequest);
     }
 
     private void checkFirstConnection() {
@@ -101,14 +123,12 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Quelle est ton année ?");
         builder.setItems(fonts, (dialog, which) -> {
-            if ("A1".equals(fonts[which])) {
-                yearTarget = 0;
-            } else if ("A2".equals(fonts[which])) {
-                yearTarget = 1;
-            } else if ("A3".equals(fonts[which])) {
-                yearTarget = 2;
-            }
+            yearTarget = which;
+            getSharedPreferences("settings", MODE_PRIVATE).edit().putInt("year", which).apply();
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
+            refreshBitmapList();
+            refreshImage();
+            refresh();
         }).setOnCancelListener(dialog -> {
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
         });
@@ -190,14 +210,10 @@ public class MainActivity extends AppCompatActivity {
 
         images.clear();
 
-        String name;
-        int i = 0;
-        i++;
-        name = "A" + (yearTarget + 1) + "_S" + i + ".pdf.png";
-        while (new File(getFilesDir() + "/" + name).exists()) {
+
+        for (File file : getAllFile(getFilesDir(), yearTarget, false)) {
             try {
-                System.out.println("loading " + getFilesDir() + "/" + name);
-                File file = new File(getFilesDir() + "/" + name);
+                System.out.println("loading " + file.getAbsolutePath());
                 InputStream inputStream = new FileInputStream(file);
 
                 BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(inputStream, false);
@@ -215,12 +231,24 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            i++;
-            name = "A" + (yearTarget + 1) + "_S" + i + ".pdf.png";
         }
+
+
         if (currentImage == -1) {
             currentImage = images.size() - 1;
         }
+    }
+
+    public static List<File> getAllFile(File fileDir, int yearTarget, boolean justPdf) {
+        List<File> files = new ArrayList<>();
+        int i = 1;
+        File actualFile = new File(fileDir + "/" + "A" + (yearTarget + 1) + "_S" + i + ".pdf" + (justPdf ? "" : ".png"));
+        while (actualFile.exists()) {
+            files.add(actualFile);
+            i++;
+            actualFile = new File(fileDir + "/" + "A" + (yearTarget + 1) + "_S" + i + ".pdf" + (justPdf ? "" : ".png"));
+        }
+        return files;
     }
 
     public void previousImage(View view) {
