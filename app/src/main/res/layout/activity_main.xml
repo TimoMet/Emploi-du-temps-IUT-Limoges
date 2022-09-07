@@ -86,7 +86,8 @@
             android:contentDescription="settings"
             android:onClick="updateMenu"
             app:fabSize="mini"
-            app:srcCompat="@drawable/ic_baseline_settings_24" />
+            app:srcCompat="@drawable/ic_baseline_settings_24"
+            tools:ignore="DuplicateClickableBoundsCheck" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/menuRefresh"

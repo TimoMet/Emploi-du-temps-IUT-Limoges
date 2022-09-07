@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -48,6 +49,11 @@ public class Notifications {
 
 
     public static void createNewEdtNotification(Context context, int newEdt) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        if (!sharedPreferences.getBoolean("notifNewEdt", true)) {
+            return;
+        }
+
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NEW_EDT)
@@ -61,6 +67,11 @@ public class Notifications {
     }
 
     public static void createEdtChangedNotification(Context context, int edtChanged) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        if (!sharedPreferences.getBoolean("notifEdtChanged", true)) {
+            return;
+        }
+
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, EDT_CHANGED)
@@ -77,6 +88,11 @@ public class Notifications {
     }
 
     public static void createEdtChangedSummaryNotification(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        if (!sharedPreferences.getBoolean("notifEdtChanged", true)) {
+            return;
+        }
+
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, EDT_CHANGED)
