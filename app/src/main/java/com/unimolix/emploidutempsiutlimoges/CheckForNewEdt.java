@@ -37,32 +37,42 @@ public class CheckForNewEdt extends Worker {
         Context context = getApplicationContext();
         int yearTarget = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("year", 0);
 
-        List<File> actualPdfs = MainActivity.getAllFile(context.getFilesDir(), yearTarget, true);
-        List<File> newPdfs = downloadAllPdf(yearTarget, context.getCacheDir());
+        try {
+            List<File> actualPdfs = MainActivity.getAllFile(context.getFilesDir(), yearTarget, true);
+            List<File> newPdfs = downloadAllPdf(yearTarget, context.getCacheDir());
 
-        if(isThereNewEdt(actualPdfs, newPdfs))
-            Notifications.createNewEdtNotification(context, newPdfs.size());
-
-        List<Boolean> changes = checkPdfChanges(actualPdfs, newPdfs);
-
-        for (int i = 0; i < changes.size(); i++) {
-            if(changes.get(i)){
-                Notifications.createEdtChangedNotification(context, i+1);
-                Notifications.createEdtChangedSummaryNotification(context);
+            if (newPdfs.size() < actualPdfs.size()) {
+                return Result.failure();
             }
+
+            if (isThereNewEdt(actualPdfs, newPdfs))
+                Notifications.createNewEdtNotification(context, newPdfs.size());
+
+            List<Boolean> changes = checkPdfChanges(actualPdfs, newPdfs);
+
+            for (int i = 0; i < changes.size(); i++) {
+                if (changes.get(i)) {
+                    Notifications.createEdtChangedNotification(context, i + 1);
+                    Notifications.createEdtChangedSummaryNotification(context);
+                }
+            }
+
+
+            for (File newPdf : newPdfs) {
+                newPdf.renameTo(new File(context.getFilesDir(), newPdf.getName()));
+            }
+
+            return Result.success();
+        } catch (Exception e) {
+            Log.e("Edt check offline", "Error while checking for edts", e);
+            return Result.failure();
         }
 
-
-        for (File newPdf : newPdfs) {
-            newPdf.renameTo(new File(context.getFilesDir(), newPdf.getName()));
-        }
-
-        return Result.success();
     }
 
 
     public boolean isThereNewEdt(List<File> actualPdfs, List<File> newPdfs) {
-        return actualPdfs.size() != newPdfs.size();
+        return actualPdfs.size() < newPdfs.size();
     }
 
     public List<Boolean> checkPdfChanges(List<File> actualPdfs, List<File> newPdfs) {
@@ -81,7 +91,7 @@ public class CheckForNewEdt extends Worker {
     }
 
 
-    public List<File> downloadAllPdf(int targetYear, File cacheDir) {
+    public List<File> downloadAllPdf(int targetYear, File cacheDir) throws Exception {
         String name;
         int i = 1;
         name = "A" + (targetYear + 1) + "_S" + i + ".pdf";
@@ -99,7 +109,7 @@ public class CheckForNewEdt extends Worker {
     }
 
 
-    public boolean DownloadPdf(String url, File destination) {
+    public boolean DownloadPdf(String url, File destination) throws Exception {
         System.out.println("Downloading Pdf...");
         try {
             URL u = new URL(url);
@@ -110,6 +120,7 @@ public class CheckForNewEdt extends Worker {
             byte[] buffer = new byte[1024];
             int length;
 
+
             FileOutputStream fos = new FileOutputStream(destination);
             while ((length = dis.read(buffer)) > 0) {
                 fos.write(buffer, 0, length);
@@ -118,13 +129,8 @@ public class CheckForNewEdt extends Worker {
 
         } catch (FileNotFoundException e) {
             Log.w("file not found", destination.getName() + " not found", e);
-        } catch (MalformedURLException mue) {
-            Log.e("SYNC getUpdate", "malformed url error", mue);
-        } catch (IOException ioe) {
-            Log.e("SYNC getUpdate", "io error", ioe);
-        } catch (SecurityException se) {
-            Log.e("SYNC getUpdate", "security error", se);
         }
+
         return false;
     }
 

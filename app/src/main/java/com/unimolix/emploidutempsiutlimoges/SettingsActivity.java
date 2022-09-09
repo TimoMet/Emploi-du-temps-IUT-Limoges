@@ -31,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         notifEdtChanged.setChecked(preferences.getBoolean("notifEdtChanged", true));
 
         notifEdtChanged.setOnCheckedChangeListener( (buttonView, isChecked) ->
-                preferences.edit().putBoolean("notifEdtChanged", notifNewEdt.isChecked()).apply());
+                preferences.edit().putBoolean("notifEdtChanged", notifEdtChanged.isChecked()).apply());
 
         notifNewEdt.setOnCheckedChangeListener( (buttonView, isChecked) ->
                 preferences.edit().putBoolean("notifNewEdt", notifNewEdt.isChecked()).apply());
