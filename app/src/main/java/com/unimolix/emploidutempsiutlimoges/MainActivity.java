@@ -14,13 +14,17 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 import androidx.work.Worker;
+import androidx.work.WorkerFactory;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jsibbold.zoomage.ZoomageView;
@@ -29,12 +33,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.MissingFormatArgumentException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static WeakReference<MainActivity> instance;
 
     //SwipeRefreshLayout swipeRefreshLayout;
     private ZoomageView zoomImageView;
@@ -60,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        instance = new WeakReference<>(this);
 
         progressBar = findViewById(R.id.progressBar);
         menuButton = findViewById(R.id.menuButton);
@@ -95,20 +109,38 @@ public class MainActivity extends AppCompatActivity {
         checkInBackground();
 
         refreshBitmapList();
-        refreshImage();
+
         refresh();
     }
 
 
     private void checkInBackground() {
-        WorkRequest workRequest = new OneTimeWorkRequest.Builder(CheckForNewEdt.class)
+        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForEdt.class, 20, TimeUnit.MINUTES)
                 .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork("Check Edt", ExistingPeriodicWorkPolicy.REPLACE ,periodicWorkRequest);
+    }
+
+    public void downloadedPdfs(boolean[] changes) {
+
+        SharedPreferences sharedPreferences = getSharedPreferences("EdtChanges", MODE_PRIVATE);
+
+        for (int i = 0; i < changes.length; i++) {
+            if (changes[i] || sharedPreferences.getBoolean(String.valueOf(i), false)) {
+                sharedPreferences.edit().putBoolean(String.valueOf(i), true).apply();
+                changes[i] = true;
+            }
+        }
+
+        WorkRequest workRequest = new OneTimeWorkRequest.Builder(ConvertPdfsToImages.class)
+                .setInputData(new Data.Builder()
+                        .putBooleanArray("edtsToDownload", changes)
+                        .putInt("targetYear", yearTarget)
+                        .build())
+                .build();
+
         WorkManager.getInstance(this).enqueue(workRequest);
 
-        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForNewEdt.class, 20, TimeUnit.MINUTES)
-                .build();
-
-        WorkManager.getInstance(this).enqueue(periodicWorkRequest);
     }
 
     private void checkFirstConnection() {
@@ -127,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
             getSharedPreferences("settings", MODE_PRIVATE).edit().putInt("year", which).apply();
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
             refreshBitmapList();
-            refreshImage();
             refresh();
         }).setOnCancelListener(dialog -> {
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
@@ -142,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
             yearTarget = year;
             Toast.makeText(this, "Changement d'année : A" + (year + 1), Toast.LENGTH_SHORT).show();
             refreshBitmapList();
-            refreshImage();
             refresh();
         }
     }
@@ -184,20 +214,12 @@ public class MainActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        new RefreshPdfList(yearTarget, getFilesDir(), getCacheDir(), height, width, this::onRefresh).execute(this);
-
+        //new RefreshPdfList(yearTarget, getFilesDir(), getCacheDir(), height, width, this::onRefresh).execute(this);
+        checkInBackground();
     }
 
-    public void onRefresh() {
-        refreshBitmapList();
-        refreshImage();
-        progressBar.setVisibility(View.GONE);
-        //swipeRefreshLayout.setRefreshing(false);
-    }
 
-    private void refreshImage() {
-        System.out.println("refreshImages : " + images.size() + " images; containing null : " + images.contains(null));
-
+    public void refreshImage() {
         if (images.size() == 0) {
             return;
         }
@@ -237,6 +259,8 @@ public class MainActivity extends AppCompatActivity {
         if (currentImage == -1) {
             currentImage = images.size() - 1;
         }
+
+        refreshImage();
     }
 
     public static List<File> getAllFile(File fileDir, int yearTarget, boolean justPdf) {
@@ -270,4 +294,7 @@ public class MainActivity extends AppCompatActivity {
         buttonNext.setVisibility(currentImage >= images.size() - 1 ? View.INVISIBLE : View.VISIBLE);
     }
 
+    public void refreshEnded() {
+        progressBar.setVisibility(View.GONE);
+    }
 }

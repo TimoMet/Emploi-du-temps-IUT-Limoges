@@ -1,13 +1,10 @@
 package com.unimolix.emploidutempsiutlimoges;
 
 import android.content.Context;
-import android.os.FileUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.work.ListenableWorker;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -17,23 +14,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.function.Function;
 
-public class CheckForNewEdt extends Worker {
+public class CheckForEdt extends Worker {
 
-    public CheckForNewEdt(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+
+    public CheckForEdt(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
     @NonNull
     @Override
     public Result doWork() {
+        System.out.println("CheckForEDT");
+
         Context context = getApplicationContext();
         int yearTarget = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("year", 0);
 
@@ -45,15 +44,20 @@ public class CheckForNewEdt extends Worker {
                 return Result.failure();
             }
 
-            if (isThereNewEdt(actualPdfs, newPdfs))
+            boolean[] changes = new boolean[newPdfs.size()];
+            checkPdfChanges(actualPdfs, newPdfs, changes);
+
+            for (int i = 0; i < changes.length; i++) {
+                if(!changes[i])
+                    continue;
+                Notifications.createEdtChangedNotification(context, i + 1);
+                Notifications.createEdtChangedSummaryNotification(context);
+            }
+
+            if (isThereNewEdt(actualPdfs, newPdfs)) {
                 Notifications.createNewEdtNotification(context, newPdfs.size());
-
-            List<Boolean> changes = checkPdfChanges(actualPdfs, newPdfs);
-
-            for (int i = 0; i < changes.size(); i++) {
-                if (changes.get(i)) {
-                    Notifications.createEdtChangedNotification(context, i + 1);
-                    Notifications.createEdtChangedSummaryNotification(context);
+                for (int i = actualPdfs.size(); i < newPdfs.size(); i++) { //add all the new pdfs to changes
+                    changes[i] = true;
                 }
             }
 
@@ -61,6 +65,13 @@ public class CheckForNewEdt extends Worker {
             for (File newPdf : newPdfs) {
                 newPdf.renameTo(new File(context.getFilesDir(), newPdf.getName()));
             }
+
+            final MainActivity mainActivity = MainActivity.instance.get();
+
+            if (mainActivity != null) {
+                mainActivity.downloadedPdfs(changes);
+            }
+
 
             return Result.success();
         } catch (Exception e) {
@@ -75,19 +86,18 @@ public class CheckForNewEdt extends Worker {
         return actualPdfs.size() < newPdfs.size();
     }
 
-    public List<Boolean> checkPdfChanges(List<File> actualPdfs, List<File> newPdfs) {
-        List<Boolean> result = new ArrayList<>();
+    public boolean[] checkPdfChanges(List<File> actualPdfs, List<File> newPdfs, boolean[] changes) {
         for (int i = 0; i < actualPdfs.size(); i++) {
             try {
                 byte[] f1 = Files.readAllBytes(actualPdfs.get(i).toPath());
                 byte[] f2 = Files.readAllBytes(newPdfs.get(i).toPath());
-                result.add(!Arrays.equals(f1, f2));
+                changes[i] = !Arrays.equals(f1, f2);
             } catch (IOException e) {
                 e.printStackTrace();
-                result.add(false);
+                changes[i] = false;
             }
         }
-        return result;
+        return changes;
     }
 
 
