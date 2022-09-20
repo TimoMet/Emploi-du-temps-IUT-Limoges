@@ -14,8 +14,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -23,8 +21,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
-import androidx.work.Worker;
-import androidx.work.WorkerFactory;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jsibbold.zoomage.ZoomageView;
@@ -35,14 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.MissingFormatArgumentException;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,12 +72,6 @@ public class MainActivity extends AppCompatActivity {
         buttonNext = findViewById(R.id.next);
         buttonPrevious = findViewById(R.id.previous);
         zoomImageView = findViewById(R.id.zoomImage);
-        /*swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            swipeRefreshLayout.setRefreshing(false);
-            refresh();
-        });
-        swipeRefreshLayout.setRefreshing(true);*/
 
         refreshInMenu.setOnClickListener(v -> {
             closeFABMenu();
@@ -160,9 +144,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
             refreshBitmapList();
             refresh();
-        }).setOnCancelListener(dialog -> {
-            Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
-        });
+        }).setOnCancelListener(dialog -> Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show());
         builder.show();
         preferences.edit().putBoolean("hasOpened", true).apply();
     }
@@ -212,9 +194,6 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
-        //new RefreshPdfList(yearTarget, getFilesDir(), getCacheDir(), height, width, this::onRefresh).execute(this);
         checkInBackground();
     }
 
@@ -244,10 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
                 matrix.postRotate(90);
 
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
-
-                Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                images.add(rotatedBitmap);
+                images.add(bitmap);
 
 
             } catch (IOException e) {

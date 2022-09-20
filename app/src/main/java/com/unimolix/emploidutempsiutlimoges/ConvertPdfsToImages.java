@@ -1,19 +1,14 @@
 package com.unimolix.emploidutempsiutlimoges;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
-import android.net.Uri;
+import android.graphics.pdf.PdfRenderer;
+import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
-import org.vudroid.core.DecodeServiceBase;
-import org.vudroid.pdfdroid.codec.PdfContext;
-import org.vudroid.pdfdroid.codec.PdfPage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +43,7 @@ public class ConvertPdfsToImages extends Worker {
             }
         }
 
-        downloadImages(pdfListToDownload, getApplicationContext().getContentResolver());
+        downloadImages(pdfListToDownload);
 
 
         refreshOnMainActivity(true);
@@ -71,33 +66,29 @@ public class ConvertPdfsToImages extends Worker {
     }
 
 
-    private void downloadImages(List<File> pdfs, ContentResolver content) {
+    private void downloadImages(List<File> pdfs) {
         System.out.println("Converting to Images... " + pdfs.size());
 
 
         for (int i = 0; i < pdfs.size(); i++) {
             File pdf = pdfs.get(i);
             System.out.println("Converting " + pdf.getName() + " ...");
-            DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
-            decodeService.setContentResolver(content);
-            decodeService.open(Uri.fromFile(pdf));
-
-
-            System.out.println("decode page ...");
-            PdfPage page = (PdfPage) decodeService.getPage(0);
-
-            RectF rectF = new RectF(0, 0, 1, 1);
-
-
-            double scaleBy = 4096 / (double) page.getHeight();
-
-            int with = (int) (page.getWidth() * scaleBy);
-            int height = (int) (page.getHeight() * scaleBy);
-
-            System.out.println("render bitmap");
-            Bitmap bitmap = page.renderBitmap(with, height, rectF);
 
             try {
+                PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdf, ParcelFileDescriptor.MODE_READ_ONLY));
+
+                PdfRenderer.Page page = renderer.openPage(0);
+
+                double scaleBy = 2048 / (double) page.getHeight();
+
+                int width = (int) (page.getWidth() * scaleBy);
+                int height = (int) (page.getHeight() * scaleBy);
+
+                Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
+
+
                 File outputFile = new File(getApplicationContext().getFilesDir() + "/" + pdf.getName() + ".png");
                 FileOutputStream outputStream = new FileOutputStream(outputFile);
 
@@ -106,6 +97,9 @@ public class ConvertPdfsToImages extends Worker {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
 
                 outputStream.close();
+                page.close();
+                renderer.close();
+
                 sharedPreferences.edit().putBoolean(String.valueOf(i), false).apply();
 
 
