@@ -136,7 +136,7 @@
                 android:layout_height="120dp"
                 android:fontFamily="sans-serif"
                 android:gravity="bottom|center_horizontal"
-                android:text="By TImothée Métais (c'est un bg et il s'aime beaucoup), pas responsable d'une absence d'un élève, si mauvais fonctionnement de l'appli (svp me tapez pas si ça arrive)"
+                android:text="By Timothée Métais (c'est un bg et il s'aime beaucoup), pas responsable d'une absence d'un élève, si mauvais fonctionnement de l'appli (svp me tapez pas si ça arrive)"
                 android:textColor="?attr/actionMenuTextColor"
                 android:textSize="15sp" />
 
