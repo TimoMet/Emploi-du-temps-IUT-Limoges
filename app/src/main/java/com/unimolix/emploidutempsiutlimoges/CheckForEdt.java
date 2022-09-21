@@ -1,7 +1,6 @@
 package com.unimolix.emploidutempsiutlimoges;
 
 import android.content.Context;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 public class CheckForEdt extends Worker {
 
@@ -86,7 +84,7 @@ public class CheckForEdt extends Worker {
         return actualPdfs.size() < newPdfs.size();
     }
 
-    public boolean[] checkPdfChanges(List<File> actualPdfs, List<File> newPdfs, boolean[] changes) {
+    public void checkPdfChanges(List<File> actualPdfs, List<File> newPdfs, boolean[] changes) {
         for (int i = 0; i < actualPdfs.size(); i++) {
             try {
                 byte[] f1 = Files.readAllBytes(actualPdfs.get(i).toPath());
@@ -97,7 +95,6 @@ public class CheckForEdt extends Worker {
                 changes[i] = false;
             }
         }
-        return changes;
     }
 
 
