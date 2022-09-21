@@ -57,12 +57,12 @@ public class Notifications {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NEW_EDT)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Nouvel emploi du temps")
                 .setContentText("L'emploi du temps de la semaine " + newEdt + " est disponible")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.logo_edt);
         NotificationManagerCompat.from(context).notify(0, builder.build());
     }
 
@@ -75,13 +75,13 @@ public class Notifications {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, EDT_CHANGED)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Changement emploi du temps")
                 .setContentText("L'emploi du temps de la semaine " + edtChanged + " a été changé")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .setGroup(GROUP_EDT_CHANGED);
+                .setGroup(GROUP_EDT_CHANGED)
+                .setSmallIcon(R.drawable.logo_edt);
 
         NotificationManagerCompat.from(context).notify(edtChanged, builder.build());
 
@@ -96,14 +96,14 @@ public class Notifications {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, EDT_CHANGED)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Changement emploi du temps")
                 .setContentText("Plusieurs emplois du temps ont été changés")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setGroup(GROUP_EDT_CHANGED)
-                .setGroupSummary(true);
+                .setGroupSummary(true)
+                .setSmallIcon(R.drawable.logo_edt);
 
         NotificationManagerCompat.from(context).notify(1000, builder.build());
     }
