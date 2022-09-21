@@ -58,7 +58,7 @@ public class ConvertPdfsToImages extends Worker {
             return;
         MainActivity mainActivity = MainActivity.instance.get();
         mainActivity.runOnUiThread(() -> {
-            mainActivity.refreshBitmapList();
+            mainActivity.refreshBitmapList(targetYear);
             if (ended)
                 mainActivity.refreshEnded();
         });

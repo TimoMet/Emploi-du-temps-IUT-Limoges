@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         checkInBackground();
 
-        refreshBitmapList();
+        refreshBitmapList(yearTarget);
 
         refresh();
     }
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             yearTarget = which;
             getSharedPreferences("settings", MODE_PRIVATE).edit().putInt("year", which).apply();
             Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show();
-            refreshBitmapList();
+            refreshBitmapList(yearTarget);
             refresh();
         }).setOnCancelListener(dialog -> Toast.makeText(this, "Vous pourrez changer l'année dans les paramètres", Toast.LENGTH_SHORT).show());
         builder.show();
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         if (year != yearTarget) {
             yearTarget = year;
             Toast.makeText(this, "Changement d'année : A" + (year + 1), Toast.LENGTH_SHORT).show();
-            refreshBitmapList();
+            refreshBitmapList(yearTarget);
             refresh();
         }
     }
@@ -206,8 +206,11 @@ public class MainActivity extends AppCompatActivity {
         updateButtons();
     }
 
-    public void refreshBitmapList() {
+    public void refreshBitmapList(int year) {
         System.out.println("refreshBitmapList");
+        if (year != yearTarget) {
+            return;
+        }
 
         images.clear();
 
