@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void checkInBackground() {
-        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForEdt.class, 20, TimeUnit.MINUTES)
+        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForEdt.class, 15, TimeUnit.MINUTES)
                 .build();
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork("Check Edt", ExistingPeriodicWorkPolicy.REPLACE ,periodicWorkRequest);
