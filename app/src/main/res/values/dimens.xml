@@ -3,4 +3,6 @@
     <dimen name="standard_50">50dp</dimen>
     <dimen name="standard_100">100dp</dimen>
     <dimen name="standard_150">150dp</dimen>
+    <dimen name="setting_element_height">70dp</dimen>
+    <dimen name="settings_element_space">10dp</dimen>
 </resources>

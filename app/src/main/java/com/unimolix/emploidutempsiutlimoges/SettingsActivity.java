@@ -26,15 +26,20 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         Switch notifNewEdt = findViewById(R.id.notifNewEdt);
         Switch notifEdtChanged = findViewById(R.id.notifEdtChanged);
+        Switch keepPositionOfEdt = findViewById(R.id.keepPositionOfEdt);
 
         notifNewEdt.setChecked(preferences.getBoolean("notifNewEdt", true));
         notifEdtChanged.setChecked(preferences.getBoolean("notifEdtChanged", true));
+        keepPositionOfEdt.setChecked(preferences.getBoolean("backToLastPosition", true));
 
         notifEdtChanged.setOnCheckedChangeListener( (buttonView, isChecked) ->
                 preferences.edit().putBoolean("notifEdtChanged", notifEdtChanged.isChecked()).apply());
 
         notifNewEdt.setOnCheckedChangeListener( (buttonView, isChecked) ->
                 preferences.edit().putBoolean("notifNewEdt", notifNewEdt.isChecked()).apply());
+
+        keepPositionOfEdt.setOnCheckedChangeListener( (buttonView, isChecked) ->
+                preferences.edit().putBoolean("backToLastPosition", keepPositionOfEdt.isChecked()).apply());
 
     }
 

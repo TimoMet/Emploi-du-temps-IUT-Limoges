@@ -23,7 +23,7 @@
             <TextView
                 android:id="@+id/yearTitle"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/setting_element_height"
                 android:fontFamily="sans-serif"
                 android:gravity="center|left"
                 android:text="Emploi du temps : "
@@ -32,11 +32,13 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/setting_element_height"
                 android:background="?layoutBackground"
                 android:clickable="true"
                 android:contextClickable="true"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/settings_element_space">
+
 
                 <TextView
                     android:id="@+id/textView"
@@ -59,10 +61,38 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/setting_element_height"
+                android:background="?layoutBackground"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center"
+                    android:text="Retourner à la dernière position au lancement"
+                    android:textColor="?attr/actionMenuTextColor"
+                    android:textSize="20sp" />
+
+                <Switch
+                    android:id="@+id/keepPositionOfEdt"
+                    android:layout_width="55dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="30dp"
+                    android:checked="true"
+                    android:gravity="center_vertical"
+                    android:showText="false"
+                    android:switchMinWidth="55dp"
+                    tools:checked="true" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/notificationText"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/setting_element_height"
                 android:fontFamily="sans-serif"
                 android:gravity="center|left"
                 android:text="Notifications : "
@@ -71,9 +101,10 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/setting_element_height"
                 android:background="?layoutBackground"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/settings_element_space">
 
                 <TextView
                     android:id="@+id/textView2"
@@ -98,13 +129,9 @@
                     tools:checked="true" />
             </LinearLayout>
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/setting_element_height"
                 android:background="?layoutBackground"
                 android:orientation="horizontal">
 

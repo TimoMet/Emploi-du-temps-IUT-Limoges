@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(CheckForEdt.class, 15, TimeUnit.MINUTES)
                 .build();
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork("Check Edt", ExistingPeriodicWorkPolicy.REPLACE ,periodicWorkRequest);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork("Check Edt", ExistingPeriodicWorkPolicy.REPLACE, periodicWorkRequest);
     }
 
     public void downloadedPdfs(boolean[] changes) {
@@ -203,6 +203,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         zoomImageView.setImageBitmap(images.get(currentImage));
+
+        getSharedPreferences("infos", MODE_PRIVATE).edit().putInt("lastPosition", currentImage).apply();
+
         updateButtons();
     }
 
@@ -236,7 +239,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (currentImage == -1) {
-            currentImage = images.size() - 1;
+            boolean backToLastPosition = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("backToLastPosition", true);
+
+            if (backToLastPosition) {
+                currentImage = getSharedPreferences("infos", MODE_PRIVATE).getInt("lastPosition", images.size() - 1);
+            } else {
+                currentImage = images.size() - 1;
+            }
         }
 
         refreshImage();
@@ -276,4 +285,5 @@ public class MainActivity extends AppCompatActivity {
     public void refreshEnded() {
         progressBar.setVisibility(View.GONE);
     }
+
 }
