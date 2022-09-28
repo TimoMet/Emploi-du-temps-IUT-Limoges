@@ -1,7 +1,6 @@
-package com.unimolix.emploidutempsiutlimoges;
+package com.TimoEnSolo.emploidutempsiutlimoges;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
