@@ -107,15 +107,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void downloadedPdfs(boolean[] changes) {
 
-        SharedPreferences sharedPreferences = getSharedPreferences("EdtChanges", MODE_PRIVATE);
-
-        for (int i = 0; i < changes.length; i++) {
-            if (changes[i] || sharedPreferences.getBoolean(String.valueOf(i), false)) {
-                sharedPreferences.edit().putBoolean(String.valueOf(i), true).apply();
-                changes[i] = true;
-            }
-        }
-
         WorkRequest workRequest = new OneTimeWorkRequest.Builder(ConvertPdfsToImages.class)
                 .setInputData(new Data.Builder()
                         .putBooleanArray("edtsToDownload", changes)
@@ -243,6 +234,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (backToLastPosition) {
                 currentImage = getSharedPreferences("infos", MODE_PRIVATE).getInt("lastPosition", images.size() - 1);
+                if (currentImage >= images.size()) {
+                    currentImage = images.size() - 1;
+                }
             } else {
                 currentImage = images.size() - 1;
             }

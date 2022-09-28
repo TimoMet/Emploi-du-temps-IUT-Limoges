@@ -1,6 +1,7 @@
 package com.unimolix.emploidutempsiutlimoges;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -62,6 +63,15 @@ public class CheckForEdt extends Worker {
 
             for (File newPdf : newPdfs) {
                 newPdf.renameTo(new File(context.getFilesDir(), newPdf.getName()));
+            }
+
+            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("EdtChanges", Context.MODE_PRIVATE);
+
+            for (int i = 0; i < changes.length; i++) {
+                if (changes[i] || sharedPreferences.getBoolean(String.valueOf(i), false)) {
+                    sharedPreferences.edit().putBoolean(String.valueOf(i), true).apply();
+                    changes[i] = true;
+                }
             }
 
             final MainActivity mainActivity = MainActivity.instance.get();
