@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity() {
         val year = getSharedPreferences("settings", MODE_PRIVATE).getInt("year", 0)
         if (year != yearTarget) {
             yearTarget = year
+            currentImage = 0
             Toast.makeText(this, "Changement d'année : A" + (year + 1), Toast.LENGTH_SHORT).show()
             refreshBitmapList(yearTarget)
             refresh()
@@ -168,6 +169,9 @@ class MainActivity : AppCompatActivity() {
     fun refreshImage() {
         if (images.size == 0) {
             return
+        }
+        if (currentImage >= images.size) {
+            currentImage = 0
         }
         zoomImageView!!.setImageBitmap(images[currentImage])
         getSharedPreferences("infos", MODE_PRIVATE).edit().putInt("lastPosition", currentImage)
