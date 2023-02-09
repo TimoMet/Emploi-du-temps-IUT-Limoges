@@ -1,6 +1,18 @@
 <resources>
     <string name="app_name">Emploi du temps IUT Limoges</string>
     <string name="edt">EDT</string>
+    <string name="title_edt_settings">Emploi du temps :</string>
+    <string name="setting_year">Année :</string>
+    <string name="settings_get_back_to_same_pos">Retourner à la dernière position au lancement</string>
+    <string name="setting_title_notif">Notifications :</string>
+    <string name="setting_new_edt">Nouvel emploi du temps</string>
+    <string name="setting_notif_change_edt">Changement d\'emploi du temps</string>
+    <string name="prevention_text">By Timothée Métais (c\'est un bg et il s\'aime beaucoup), pas responsable d\'une absence d\'un élève, si mauvais fonctionnement de l\'appli (svp me tapez pas si ça arrive)</string>
+    <string name="btn_next_description">next image</string>
+    <string name="btn_previous_description">previous image</string>
+    <string name="btn_settings_description">settings</string>
+    <string name="btn_refresh_description">refresh</string>
+    <string name="btn_menu_description">show menu</string>
     <string-array name="year_array">
         <item>A1</item>
         <item>A2</item>

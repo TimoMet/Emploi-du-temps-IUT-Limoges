@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -68,7 +67,8 @@ class MainActivity : AppCompatActivity() {
             PeriodicWorkRequest.Builder(CheckForEdt::class.java, 15, TimeUnit.MINUTES)
                 .build()
 
-        println("Enqueue")
+        println("Enqueue Check Edt")
+
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "Check Edt",
@@ -78,6 +78,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun downloadedPdfs(changes: BooleanArray?) {
+
+        println("Enqueue Convert Pdfs To Images")
+
         val workRequest: WorkRequest = OneTimeWorkRequest.Builder(ConvertPdfsToImages::class.java)
             .setInputData(
                 Data.Builder()
@@ -140,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         checkYearTarget()
     }
 
-    fun updateMenu(view: View?) {
+    fun updateMenu(@Suppress("UNUSED_PARAMETER") view: View?) {
         if (!isFABOpen) {
             showFABMenu()
         } else {
@@ -161,12 +164,12 @@ class MainActivity : AppCompatActivity() {
         menuButton!!.translationZ = 1f
     }
 
-    fun refresh() {
+    private fun refresh() {
         progressBar!!.visibility = View.VISIBLE
         checkInBackground()
     }
 
-    fun refreshImage() {
+    private fun refreshImage() {
         if (images.size == 0) {
             return
         }
@@ -176,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         zoomImageView!!.setImageBitmap(images[currentImage])
         getSharedPreferences("infos", MODE_PRIVATE).edit().putInt("lastPosition", currentImage)
             .apply()
-        updateButtons();
+        updateButtons()
     }
 
     fun refreshBitmapList(year: Int) {
@@ -189,6 +192,9 @@ class MainActivity : AppCompatActivity() {
             try {
                 println("loading " + file.absolutePath)
                 val inputStream: InputStream = FileInputStream(file)
+
+                //deprecated but has to be used for under API 28
+                @Suppress("DEPRECATION")
                 val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
                 val bitmap = decoder!!.decodeRegion(
                     Rect(0, 0, decoder.width, decoder.height),
@@ -221,14 +227,14 @@ class MainActivity : AppCompatActivity() {
         refreshImage()
     }
 
-    fun previousImage(view: View?) {
+    fun previousImage(@Suppress("UNUSED_PARAMETER") view: View?) {
         if (currentImage > 0) {
             currentImage--
             refreshImage()
         }
     }
 
-    fun nextImage(view: View?) {
+    fun nextImage(@Suppress("UNUSED_PARAMETER") view: View?) {
         if (currentImage < images.size - 1) {
             currentImage++
             refreshImage()

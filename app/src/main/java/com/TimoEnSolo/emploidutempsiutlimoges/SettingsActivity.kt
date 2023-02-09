@@ -6,8 +6,8 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
 import android.widget.Spinner
-import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 
 class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var preferences: SharedPreferences? = null
@@ -18,20 +18,20 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         yearChoice.onItemSelectedListener = this
         preferences = getSharedPreferences("settings", MODE_PRIVATE)
         yearChoice.setSelection(preferences!!.getInt("year", 0))
-        val notifNewEdt = findViewById<Switch>(R.id.notifNewEdt)
-        val notifEdtChanged = findViewById<Switch>(R.id.notifEdtChanged)
-        val keepPositionOfEdt = findViewById<Switch>(R.id.keepPositionOfEdt)
+        val notifNewEdt = findViewById<SwitchCompat>(R.id.notifNewEdt)
+        val notifEdtChanged = findViewById<SwitchCompat>(R.id.notifEdtChanged)
+        val keepPositionOfEdt = findViewById<SwitchCompat>(R.id.keepPositionOfEdt)
         notifNewEdt.isChecked = preferences!!.getBoolean("notifNewEdt", true)
         notifEdtChanged.isChecked = preferences!!.getBoolean("notifEdtChanged", true)
         keepPositionOfEdt.isChecked = preferences!!.getBoolean("backToLastPosition", true)
-        notifEdtChanged.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            preferences!!.edit().putBoolean("notifEdtChanged", notifEdtChanged.isChecked).apply()
+        notifEdtChanged.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            preferences!!.edit().putBoolean("notifEdtChanged", isChecked).apply()
         }
-        notifNewEdt.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            preferences!!.edit().putBoolean("notifNewEdt", notifNewEdt.isChecked).apply()
+        notifNewEdt.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            preferences!!.edit().putBoolean("notifNewEdt", isChecked).apply()
         }
-        keepPositionOfEdt.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            preferences!!.edit().putBoolean("backToLastPosition", keepPositionOfEdt.isChecked).apply()
+        keepPositionOfEdt.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            preferences!!.edit().putBoolean("backToLastPosition", isChecked).apply()
         }
     }
 

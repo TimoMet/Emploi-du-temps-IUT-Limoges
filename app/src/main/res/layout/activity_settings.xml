@@ -25,8 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/setting_element_height"
                 android:fontFamily="sans-serif"
-                android:gravity="center|left"
-                android:text="Emploi du temps : "
+                android:gravity="center|start"
+                android:text="@string/title_edt_settings"
                 android:textColor="?attr/colorControlNormal"
                 android:textSize="20sp" />
 
@@ -47,7 +47,7 @@
                     android:layout_weight="2"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
-                    android:text="Année :"
+                    android:text="@string/setting_year"
                     android:textColor="?attr/actionMenuTextColor"
                     android:textSize="20sp" />
 
@@ -68,16 +68,16 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
-                    android:text="Retourner à la dernière position au lancement"
+                    android:text="@string/settings_get_back_to_same_pos"
                     android:textColor="?attr/actionMenuTextColor"
                     android:textSize="20sp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/keepPositionOfEdt"
                     android:layout_width="55dp"
                     android:layout_height="match_parent"
@@ -94,8 +94,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/setting_element_height"
                 android:fontFamily="sans-serif"
-                android:gravity="center|left"
-                android:text="Notifications : "
+                android:gravity="center|start"
+                android:text="@string/setting_title_notif"
                 android:textColor="?attr/colorControlNormal"
                 android:textSize="20sp" />
 
@@ -108,16 +108,16 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
-                    android:text="Nouvel emploi du temps"
+                    android:text="@string/setting_new_edt"
                     android:textColor="?attr/actionMenuTextColor"
                     android:textSize="20sp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/notifNewEdt"
                     android:layout_width="55dp"
                     android:layout_height="match_parent"
@@ -136,16 +136,16 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
-                    android:text="Changement d'emploi du temps"
+                    android:text="@string/setting_notif_change_edt"
                     android:textColor="?attr/actionMenuTextColor"
                     android:textSize="20sp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/notifEdtChanged"
                     android:layout_width="55dp"
                     android:layout_height="match_parent"
@@ -163,7 +163,7 @@
                 android:layout_height="120dp"
                 android:fontFamily="sans-serif"
                 android:gravity="bottom|center_horizontal"
-                android:text="By Timothée Métais (c'est un bg et il s'aime beaucoup), pas responsable d'une absence d'un élève, si mauvais fonctionnement de l'appli (svp me tapez pas si ça arrive)"
+                android:text="@string/prevention_text"
                 android:textColor="?attr/actionMenuTextColor"
                 android:textSize="15sp" />
 

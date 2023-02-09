@@ -54,11 +54,11 @@ class CheckForEdt(context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    fun isThereNewEdt(actualPdfs: List<File>, newPdfs: List<File>): Boolean {
+    private fun isThereNewEdt(actualPdfs: List<File>, newPdfs: List<File>): Boolean {
         return actualPdfs.size < newPdfs.size
     }
 
-    fun checkPdfChanges(actualPdfs: List<File>, newPdfs: List<File>, changes: BooleanArray) {
+    private fun checkPdfChanges(actualPdfs: List<File>, newPdfs: List<File>, changes: BooleanArray) {
         for (i in actualPdfs.indices) {
             try {
                 val f1 = Files.readAllBytes(actualPdfs[i].toPath())
@@ -78,7 +78,7 @@ class CheckForEdt(context: Context, workerParams: WorkerParameters) :
         name = "A" + (targetYear + 1) + "_S" + i + ".pdf"
         val pdfList: MutableList<File> = ArrayList()
         var actualPdf = File(cacheDir, name)
-        while (DownloadPdf(
+        while (downloadPdf(
                 "http://edt-iut-info.unilim.fr/edt/A" + (targetYear + 1) + "/" + name,
                 actualPdf
             )
@@ -92,7 +92,7 @@ class CheckForEdt(context: Context, workerParams: WorkerParameters) :
     }
 
     @Throws(Exception::class)
-    fun DownloadPdf(url: String?, destination: File): Boolean {
+    fun downloadPdf(url: String?, destination: File): Boolean {
         println("Downloading Pdf...")
         try {
             val u = URL(url)

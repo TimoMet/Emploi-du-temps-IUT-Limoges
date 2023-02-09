@@ -5,7 +5,8 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
-import androidx.work.*
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -24,7 +25,7 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
     }
 
     override fun doWork(): Result {
-        val pdfList: List<File> = MainActivity.Companion.getAllFile(
+        val pdfList: List<File> = MainActivity.getAllFile(
             applicationContext.filesDir, targetYear, true
         )
         val pdfListToDownload: MutableList<File> = ArrayList()
@@ -41,8 +42,8 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
 
     private fun refreshOnMainActivity(ended: Boolean) {
         println("refreshing main activity")
-        if (MainActivity.Companion.instance == null) return
-        val mainActivity: MainActivity = MainActivity.instance!!.get()!!
+        if (MainActivity.instance.get() == null) return
+        val mainActivity: MainActivity = MainActivity.instance.get()!!
         mainActivity.runOnUiThread {
             mainActivity.refreshBitmapList(targetYear)
             if (ended) mainActivity.refreshEnded()
