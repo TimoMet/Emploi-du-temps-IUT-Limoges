@@ -40,12 +40,15 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
         return Result.success()
     }
 
-    private fun refreshOnMainActivity(ended: Boolean) {
+    private fun refreshOnMainActivity(ended: Boolean, indexEdt: Int = -1 ) {
         println("refreshing main activity")
-        if (MainActivity.instance.get() == null) return
-        val mainActivity: MainActivity = MainActivity.instance.get()!!
+        val mainActivity: MainActivity = MainActivity.instance.get() ?: return
+
         mainActivity.runOnUiThread {
-            mainActivity.refreshBitmapList(targetYear)
+            if (indexEdt != -1)
+                mainActivity.refreshBitmapByIndex(targetYear, indexEdt)
+            else
+                mainActivity.refreshBitmapList(targetYear)
             if (ended) mainActivity.refreshEnded()
         }
     }
@@ -73,7 +76,7 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
                 page.close()
                 renderer.close()
                 sharedPreferences.edit().putBoolean(i.toString(), false).apply()
-                refreshOnMainActivity(false)
+                refreshOnMainActivity(false, i)
             } catch (e: IOException) {
                 e.printStackTrace()
             }

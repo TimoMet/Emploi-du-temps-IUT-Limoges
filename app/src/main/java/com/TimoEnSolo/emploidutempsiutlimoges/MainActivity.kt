@@ -17,7 +17,11 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.lang.ref.WeakReference
+import java.util.*
 import java.util.concurrent.TimeUnit
+
+
+private const val WORK_CHECK_EDT = "Check Edt"
 
 class MainActivity : AppCompatActivity() {
     //SwipeRefreshLayout swipeRefreshLayout;
@@ -33,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private var isFABOpen = false
     private var yearTarget = 0
     private var isStarting = true
+    private var lastRefresh = 0L
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,10 +62,10 @@ class MainActivity : AppCompatActivity() {
         checkFirstConnection()
         yearTarget = getSharedPreferences("settings", MODE_PRIVATE).getInt("year", 0)
         Notifications.createNotificationChannels(this)
-        checkInBackground()
         refreshBitmapList(yearTarget)
         refresh()
     }
+
 
     private fun checkInBackground() {
         val periodicWorkRequest =
@@ -69,9 +74,12 @@ class MainActivity : AppCompatActivity() {
 
         println("Enqueue Check Edt")
 
+        val workManager = WorkManager.getInstance(this)
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "Check Edt",
+        workManager.cancelUniqueWork(WORK_CHECK_EDT)
+
+        workManager.enqueueUniquePeriodicWork(
+            WORK_CHECK_EDT,
             ExistingPeriodicWorkPolicy.REPLACE,
             periodicWorkRequest
         )
@@ -166,6 +174,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun refresh() {
         progressBar!!.visibility = View.VISIBLE
+        lastRefresh = System.currentTimeMillis()
         checkInBackground()
     }
 
@@ -190,18 +199,7 @@ class MainActivity : AppCompatActivity() {
         images.clear()
         for (file in getAllFile(filesDir, yearTarget, false)) {
             try {
-                println("loading " + file.absolutePath)
-                val inputStream: InputStream = FileInputStream(file)
-
-                //deprecated but has to be used for under API 28
-                @Suppress("DEPRECATION")
-                val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
-                val bitmap = decoder!!.decodeRegion(
-                    Rect(0, 0, decoder.width, decoder.height),
-                    BitmapFactory.Options()
-                )
-                val matrix = Matrix()
-                matrix.postRotate(90f)
+                val bitmap = readBitmapFromFile(file)
                 images.add(bitmap)
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -227,6 +225,44 @@ class MainActivity : AppCompatActivity() {
         refreshImage()
     }
 
+    private fun readBitmapFromFile(file: File): Bitmap {
+        println("loading " + file.absolutePath)
+        val inputStream: InputStream = FileInputStream(file)
+
+        //deprecated but has to be used for under API 28
+        @Suppress("DEPRECATION")
+        val decoder = BitmapRegionDecoder.newInstance(inputStream, false)
+        val bitmap = decoder!!.decodeRegion(
+            Rect(0, 0, decoder.width, decoder.height),
+            BitmapFactory.Options()
+        )
+        val matrix = Matrix()
+        matrix.postRotate(90f)
+        return bitmap
+    }
+
+
+    fun refreshBitmapByIndex(targetYear: Int, indexEdt: Int) {
+        if (targetYear != yearTarget) {
+            return
+        }
+
+        val file = getAllFile(filesDir, yearTarget, false).get(indexEdt);
+        try {
+            val bitmap = readBitmapFromFile(file)
+            if (indexEdt >= images.size) {
+                images.add(bitmap)
+            } else {
+                images[indexEdt] = bitmap
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        if (currentImage == indexEdt) {
+            refreshImage()
+        }
+    }
+
     fun previousImage(@Suppress("UNUSED_PARAMETER") view: View?) {
         if (currentImage > 0) {
             currentImage--
@@ -250,7 +286,15 @@ class MainActivity : AppCompatActivity() {
 
     fun refreshEnded() {
         progressBar!!.visibility = View.GONE
+
+        //show time to refresh
+            Toast.makeText(
+                this,
+                "Edt rafraichi en ${(System.currentTimeMillis() - lastRefresh) / 1000f}s",
+                Toast.LENGTH_SHORT
+            ).show()
     }
+
 
     companion object {
         var instance: WeakReference<MainActivity> = WeakReference(null)
