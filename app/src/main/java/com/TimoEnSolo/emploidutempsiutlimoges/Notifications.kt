@@ -122,13 +122,25 @@ object Notifications {
     }
 
 
-    private fun hasNotificationPermission(context: Context): Boolean {
+    fun hasNotificationPermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
             return true
 
         return ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.POST_NOTIFICATIONS
-        ) != PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun forceNotificationPermission(context: Context): Boolean {
+        if (hasNotificationPermission(context))
+            return false
+
+        println("forceNotificationPermission")
+
+        val intent = Intent("android.settings.APP_NOTIFICATION_SETTINGS")
+        intent.putExtra("android.provider.extra.APP_PACKAGE", context.packageName)
+        context.startActivity(intent)
+        return true
     }
 }

@@ -21,15 +21,34 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         val notifNewEdt = findViewById<SwitchCompat>(R.id.notifNewEdt)
         val notifEdtChanged = findViewById<SwitchCompat>(R.id.notifEdtChanged)
         val keepPositionOfEdt = findViewById<SwitchCompat>(R.id.keepPositionOfEdt)
-        notifNewEdt.isChecked = preferences!!.getBoolean("notifNewEdt", true)
-        notifEdtChanged.isChecked = preferences!!.getBoolean("notifEdtChanged", true)
+
+        if (Notifications.hasNotificationPermission(this)) {
+            notifNewEdt.isChecked = preferences!!.getBoolean("notifNewEdt", true)
+            notifEdtChanged.isChecked = preferences!!.getBoolean("notifEdtChanged", true)
+        } else {
+            notifNewEdt.isChecked = false
+            notifEdtChanged.isChecked = false
+        }
+
         keepPositionOfEdt.isChecked = preferences!!.getBoolean("backToLastPosition", true)
+
+
         notifEdtChanged.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            preferences!!.edit().putBoolean("notifEdtChanged", isChecked).apply()
+            if (Notifications.forceNotificationPermission(this))
+                notifEdtChanged.isChecked = false
+            else
+                preferences!!.edit().putBoolean("notifEdtChanged", isChecked).apply()
         }
+
+
         notifNewEdt.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            preferences!!.edit().putBoolean("notifNewEdt", isChecked).apply()
+            if (Notifications.forceNotificationPermission(this))
+                notifNewEdt.isChecked = false
+            else
+                preferences!!.edit().putBoolean("notifNewEdt", isChecked).apply()
         }
+
+
         keepPositionOfEdt.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             preferences!!.edit().putBoolean("backToLastPosition", isChecked).apply()
         }
