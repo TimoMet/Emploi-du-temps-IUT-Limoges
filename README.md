@@ -12,6 +12,8 @@ Désolé si vous être des utilisateurs Iphone bah j'ai pas la license (je me su
 
 
 ### Pour télécharger:
+  -**_Nouveau_** allez dans release (à droite) et téléchargez l'apk pour l'installer sur votre téléphone
+
   -Soit vous clonez, et build vous même sur Android Studio (mais bon, c'est pas ouf)
   
   -Soit vous utilisez les actions de Github j'ai tout config normalement vous pouvez direcement télécharger l'apk, il se build à chaque commit. ([c'est ici](https://github.com/TimoMet/Emploi-du-temps-IUT-Limoges/actions))
