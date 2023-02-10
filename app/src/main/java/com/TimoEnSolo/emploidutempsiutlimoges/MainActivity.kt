@@ -284,13 +284,20 @@ class MainActivity : AppCompatActivity() {
             if (currentImage >= images.size - 1) View.INVISIBLE else View.VISIBLE
     }
 
-    fun refreshEnded() {
+    fun refreshEnded(success: Boolean = true) {
         progressBar!!.visibility = View.GONE
 
         //show time to refresh
+        if (success)
             Toast.makeText(
                 this,
                 "Edt rafraichi en ${(System.currentTimeMillis() - lastRefresh) / 1000f}s",
+                Toast.LENGTH_SHORT
+            ).show()
+        else
+            Toast.makeText(
+                this,
+                "Erreur lors du rafraichissement (en ${(System.currentTimeMillis() - lastRefresh) / 1000f}s)",
                 Toast.LENGTH_SHORT
             ).show()
     }
