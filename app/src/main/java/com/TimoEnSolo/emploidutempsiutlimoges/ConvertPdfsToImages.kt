@@ -40,17 +40,16 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
         return Result.success()
     }
 
-    private fun refreshOnMainActivity(ended: Boolean, indexEdt: Int = -1 ) {
+    private fun refreshOnMainActivity(ended: Boolean, indexEdt: Int = -1) {
         println("refreshing main activity")
         val mainActivity: MainActivity = MainActivity.instance.get() ?: return
 
-        mainActivity.runOnUiThread {
-            if (indexEdt != -1)
-                mainActivity.refreshBitmapByIndex(targetYear, indexEdt)
-            else
-                mainActivity.refreshBitmapList(targetYear)
-            if (ended) mainActivity.refreshEnded()
-        }
+        if (indexEdt != -1)
+            mainActivity.refreshBitmapByIndex(targetYear, indexEdt)
+        else
+            mainActivity.refreshBitmapList(targetYear)
+        if (ended) mainActivity.refreshEnded()
+
     }
 
     private fun downloadImages(pdfs: List<File>) {

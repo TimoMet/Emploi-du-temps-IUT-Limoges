@@ -191,6 +191,9 @@ class MainActivity : AppCompatActivity() {
         updateButtons()
     }
 
+    /**
+     * refresh the list of images (edts) from all the files
+     */
     fun refreshBitmapList(year: Int) {
         println("refreshBitmapList")
         if (year != yearTarget) {
@@ -222,9 +225,15 @@ class MainActivity : AppCompatActivity() {
                 currentImage = images.size - 1
             }
         }
-        refreshImage()
+        instance.get()?.runOnUiThread {
+            refreshImage()
+        }
     }
 
+
+    /**
+     * Return the Bitmap in this file
+     */
     private fun readBitmapFromFile(file: File): Bitmap {
         println("loading " + file.absolutePath)
         val inputStream: InputStream = FileInputStream(file)
@@ -258,8 +267,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        if (currentImage == indexEdt) {
-            refreshImage()
+
+        instance.get()?.runOnUiThread {
+            if (currentImage == indexEdt) {
+                refreshImage()
+            }
         }
     }
 
