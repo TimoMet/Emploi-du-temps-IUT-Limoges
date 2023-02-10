@@ -1,10 +1,15 @@
 package com.TimoEnSolo.emploidutempsiutlimoges
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -41,7 +46,12 @@ object Notifications {
         createEdtChangedNotificationChannel(context)
     }
 
+    @SuppressLint("MissingPermission")
     fun createNewEdtNotification(context: Context, newEdt: Int) {
+        if (!hasNotificationPermission(context)) {
+            return
+        }
+
         val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         if (!sharedPreferences.getBoolean("notifNewEdt", true)) {
             return
@@ -56,10 +66,16 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.logo_edt)
+
         NotificationManagerCompat.from(context).notify(0, builder.build())
     }
 
+    @SuppressLint("MissingPermission")
     fun createEdtChangedNotification(context: Context, edtChanged: Int) {
+        if (!hasNotificationPermission(context)) {
+            return
+        }
+
         val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         if (!sharedPreferences.getBoolean("notifEdtChanged", true)) {
             return
@@ -75,10 +91,16 @@ object Notifications {
             .setContentIntent(pendingIntent)
             .setGroup(GROUP_EDT_CHANGED)
             .setSmallIcon(R.drawable.logo_edt)
+
         NotificationManagerCompat.from(context).notify(edtChanged, builder.build())
     }
 
+    @SuppressLint("MissingPermission")
     fun createEdtChangedSummaryNotification(context: Context) {
+        if (!hasNotificationPermission(context)) {
+            return
+        }
+
         val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         if (!sharedPreferences.getBoolean("notifEdtChanged", true)) {
             return
@@ -95,6 +117,18 @@ object Notifications {
             .setGroup(GROUP_EDT_CHANGED)
             .setGroupSummary(true)
             .setSmallIcon(R.drawable.logo_edt)
+
         NotificationManagerCompat.from(context).notify(1000, builder.build())
+    }
+
+
+    private fun hasNotificationPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+            return true
+
+        return ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
     }
 }

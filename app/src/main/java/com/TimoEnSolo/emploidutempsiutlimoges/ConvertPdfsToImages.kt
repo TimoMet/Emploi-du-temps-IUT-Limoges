@@ -48,8 +48,12 @@ class ConvertPdfsToImages(context: Context, workerParams: WorkerParameters) :
             mainActivity.refreshBitmapByIndex(targetYear, indexEdt)
         else
             mainActivity.refreshBitmapList(targetYear)
-        if (ended) mainActivity.refreshEnded()
 
+        if (ended) {
+            mainActivity.runOnUiThread {
+                mainActivity.refreshEnded()
+            }
+        }
     }
 
     private fun downloadImages(pdfs: List<File>) {

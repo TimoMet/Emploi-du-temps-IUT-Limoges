@@ -4,11 +4,13 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.*
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.work.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jsibbold.zoomage.ZoomageView
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
             closeFABMenu()
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+        notificationPerm()
         checkFirstConnection()
         yearTarget = getSharedPreferences("settings", MODE_PRIVATE).getInt("year", 0)
         Notifications.createNotificationChannels(this)
@@ -100,11 +103,28 @@ class MainActivity : AppCompatActivity() {
         WorkManager.getInstance(this).enqueue(workRequest)
     }
 
+    private fun notificationPerm(){
+        //ask for notification permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                1
+            )
+        }
+    }
+
     private fun checkFirstConnection() {
+
+
+
         val preferences = getSharedPreferences("infos", MODE_PRIVATE)
         if (preferences.getBoolean("hasOpened", false)) {
             return
         }
+
+
+
         val fonts = arrayOf(
             "A1", "A2", "A3"
         )
@@ -115,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             getSharedPreferences("settings", MODE_PRIVATE).edit().putInt("year", which).apply()
             Toast.makeText(
                 this,
-                "Vous pourrez changer l'année dans les paramètres",
+               "Vous pourrez changer l'année dans les paramètres",
                 Toast.LENGTH_SHORT
             ).show()
             refreshBitmapList(yearTarget)
